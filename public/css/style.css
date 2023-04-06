@@ -1,0 +1,90 @@
+body {
+    background-color: #abd1c6;
+    text-align: center;
+  }
+  h1 {
+    color: #001e1d;
+    font-size: 36px;
+  }
+  input {
+    padding: 9px 33px;
+    font-size: 18px;
+    margin-top: 20px;
+    color: #001e1d;
+    background-color: white;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+  }
+  button {
+    padding: 10px 20px;
+    font-size: 18px;
+    margin-top: 20px;
+    color: #001e1d;
+    background-color: #f9bc60;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+  }
+  #arti {
+    padding: 20px;
+    font-size: 18px;
+    color: white;
+    margin-top: 20px;
+    background-color: #004643;
+    border-radius: 5px;
+    min-height: 100px;
+  }
+  #translate {
+    /* float: left; */
+    font-size: 18px;
+    color: white;
+    margin-top: 20px;
+    background-color: #004643;
+    min-height: 100px;
+  }
+
+
+  /* navbar */
+  #neubar {
+    background: white;
+    box-shadow: 4px 6px 12px rgba(0,0,0,0.4)
+  }
+
+  .nav-item .active {
+    border-radius: 6px;
+    color: white;
+    background: linear-gradient(90deg, #004643, #004643);
+    box-shadow:  2px 2px 8px #f9bc60, -2px -2px 8px #f9bc60;
+  }
+
+  #neubar .nav-item {
+    margin : auto 4px;
+  }
+  #neubar a {
+    padding-left:12px;
+    padding-right:12px;
+  }
+  #neubar .dropdown-menu {
+    background : #545454
+  }
+
+
+  /* textarea */
+  .copy-button {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    margin: 0px 1px 1px 0px;
+    border: 0;
+    background-color: #004643;
+    width: 40px;
+    height: 40px;
+  }
+  /* style for the textarea */
+  .textarea-wrapper {
+    position: relative;
+    margin-bottom: 1rem;
+  }
