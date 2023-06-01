@@ -35,9 +35,27 @@ class KamusController extends Controller
         // Kalimat yang dikirimkan dari ajax
         $kalimat = $request->input("kalimatIndo");
 
-        $pattern = '/\b|\s+|(?=\p{P})|(?<=\p{P})/';
+        // $pattern = '/\b|\s+|(?=\p{P})|(?<=\p{P})/';
+        $pattern = '/\b|\s+|(?=\p{P}(?<!-))|(?<=(?<!-)\p{P})/';
         $kalimat = preg_split($pattern, $kalimat, -1, PREG_SPLIT_NO_EMPTY);
 
+        // Kode menyatukan kata ulang didalam array $kalimat
+        $kataGabung = [];
+        $i = 0;
+        $count = count($kalimat);
+        while ($i < $count) {
+            $kata2 = $kalimat[$i];
+            if ($i < $count - 2 && $kalimat[$i + 1] === "-" && $kalimat[$i + 2] === $kata2) {
+                $kataGabung[] = $kata2 . "-" . $kata2;
+                $i += 3;
+            } else {
+                $kataGabung[] = $kata2;
+                $i++;
+            }
+        }
+        $kalimat = $kataGabung;
+        // echo json_encode($kalimat);exit;
+        // -------------------------------------------------------------------------------------
 
         // Pakai library sastrawi -> menghilangkan imbuhan
         $factory = new StemmerFactory();
@@ -56,22 +74,11 @@ class KamusController extends Controller
         for($z=0;$z<count($kalimat);$z++){
 
             if(in_array($kalimat[$z], $dicek)){
-
                 $kalimat[$z] = $kalimat[$z];
             } else {            
                 $kalimat[$z] = $stemmer->stem($kalimat[$z]);
             }
         }
-
-        // $imbuhan = ['me', 'men', 'mem', 'ber', 'be', 'per', 'pe'];
-        // foreach($kalimat as &$word) {
-        //     $word = preg_replace('/^('.implode('|', $imbuhan).')/', '', $word);
-        // }
-        
-        // echo json_encode($kalimat);
-        // exit;
-        // ----------------------------------------------------
-
 
 
         // Ambil kata indonesia dan ubah ke muna
@@ -92,7 +99,13 @@ class KamusController extends Controller
             $jnsKata[] = $kataMuna->jns_kata;
         }
 
-
+        // Jika kata tidak ada dalam data, maka ganti dengan input kata aslinya
+        foreach($result as $index => $val){
+            if($val === "___"){
+                $result[$index] = $kalimat[$index];
+            }
+        } // =====================================================================
+        
 
         if(count($result) == 1){
 
@@ -164,10 +177,24 @@ class KamusController extends Controller
                 }
                 // negasi kata ganti saya
                 if($result[$a] == "inodi"){
-
-                    if($jnsKata[$a+2] == "verba"){
-                        $verbaSaya = KataModel::firstWhere("kataMuna", "like", "%".$result[$a+2]);
+                    if (empty($result[$a+1])) {
+                        echo json_encode($result);
+                        exit;
+                    } 
+                    else if ($jnsKata[$a+2] != "verba"){
+                        $result[$a+2] = $result[$a+2];
+                        if(empty($jnsKata[$a+3])) {
+                            echo json_encode($result);
+                            exit;
+                        }
+                    }
+                    else {
+                        $verbaSaya = KataModel::firstWhere("kataMuna", "like", $result[$a+2]);
                         $result[$a+2] = $verbaSaya->vSaya;
+                        if(empty($jnsKata[$a+3])) {
+                            echo json_encode($result);
+                            exit;
+                        }
                     }
                     $result = $result;
                 }
