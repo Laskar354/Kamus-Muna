@@ -36,7 +36,7 @@ class KamusController extends Controller
         $kalimat = $request->input("kalimatIndo");
 
         // $pattern = '/\b|\s+|(?=\p{P})|(?<=\p{P})/';
-        $pattern = '/\b|\s+|(?=\p{P}(?<!-))|(?<=(?<!-)\p{P})/';
+        $pattern = '/\b|\s+|(?=\p{P}(?<!-))|(?<=(?<!-)\p{P})/';     
         $kalimat = preg_split($pattern, $kalimat, -1, PREG_SPLIT_NO_EMPTY);
 
         // Kode menyatukan kata ulang didalam array $kalimat
@@ -54,7 +54,6 @@ class KamusController extends Controller
             }
         }
         $kalimat = $kataGabung;
-        // echo json_encode($kalimat);exit;
         // -------------------------------------------------------------------------------------
 
         // Pakai library sastrawi -> menghilangkan imbuhan
@@ -63,14 +62,35 @@ class KamusController extends Controller
 
         // ----------------------------------------------------
         // Proses IMBUHAN
-        // Cek dulu jika kata ada dalam database kata jangan di stemmer. Jika tidak lakukaan stemmer
-
+        // Cek kata
         $cekKata = KataModel::all();
         $dicek = array();
         foreach ( $cekKata as $kata){
             $dicek[] = $kata->kataIndo;
         }
+        // ----------------------------------------------------
 
+        // imbuhan akhiran
+        foreach($kalimat as $index => $klmt){
+            if(in_array($klmt, $dicek)){
+                $kalimat[$index] = $kalimat[$index];
+            }
+            else {
+                $akhiran = ["ku", "mu", "nya"];
+                foreach($akhiran as $akhir){
+                    if(substr($klmt, -strlen($akhir)) === $akhir){ // jika akhiran klmt = $akhiran 
+                        $kalimat[$index] = substr($klmt, 0, -strlen($akhir))." ". $akhir;
+                        break;
+                    }
+                }
+            }
+        }
+        $kalimat = implode(" ", $kalimat);
+        $kalimat = explode(" ", $kalimat);
+
+        // echo json_encode($kalimat);exit;
+
+        // Imbuhan awalan
         for($z=0;$z<count($kalimat);$z++){
 
             if(in_array($kalimat[$z], $dicek)){
@@ -111,41 +131,12 @@ class KamusController extends Controller
 
             echo json_encode($result);
         }
-        // Proses kalimat berisi 3 kata saja
-        // else if (count($result) <= 3 ) 
-        // {
-            
-
-        //     if(in_array("inodi", $result)){
-
-        //         //ambil index subjeknya
-        //         $i = array_search("inodi", $result);
-
-        //         //$jnsKata[$i+1] == "verba"
-        //         //in_array("verba", $jnsKata)
-        //         if($jnsKata[$i+1] == "verba"){
-        //             $j = array_search($jnsKata[$i+1], $jnsKata);
-                    
-        //             $verbaSaya = KataModel::firstWhere("kataMuna", "like", "%".$result[$j]);
-        //             $result[$j] = $verbaSaya->vSaya;
-        //         }
-        //         $result = $result;
-
-        //     }
-
-        //                 // $hasil = implode(" ", $result);
-        //     // echo json_encode($hasil);
-
-
-        //     echo json_encode($result);
-
-        // } 
         
         else 
         
         {
 
-            // -------------------------- proses Kalimat banyak kata/result disini --------------------------
+            // -------------------------- proses Kalimat banyak kata/result disini ---------------------------
 
 
             // Proses Kata Ganti Orang dalam verba
@@ -175,20 +166,15 @@ class KamusController extends Controller
                     }
                     $result = $result;
                 }
-                // negasi kata ganti saya
-                if($result[$a] == "inodi"){
-                    if (empty($result[$a+1])) {
-                        echo json_encode($result);
-                        exit;
-                    } 
-                    else if ($jnsKata[$a+2] != "verba"){
+                // sisipan tidak, belum dan sudah
+                if($result[$a] == "inodi" && $result[$a+1] == "miina" || $result[$a] == "inodi" && $result[$a+1] == "minaho" || $result[$a] == "inodi" && $result[$a+1] == "padamo"){
+                    if ($jnsKata[$a+2] != "verba"){
                         $result[$a+2] = $result[$a+2];
                         if(empty($jnsKata[$a+3])) {
                             echo json_encode($result);
                             exit;
                         }
-                    }
-                    else {
+                    } else {
                         $verbaSaya = KataModel::firstWhere("kataMuna", "like", $result[$a+2]);
                         $result[$a+2] = $verbaSaya->vSaya;
                         if(empty($jnsKata[$a+3])) {
@@ -196,7 +182,6 @@ class KamusController extends Controller
                             exit;
                         }
                     }
-                    $result = $result;
                 }
 
 
@@ -223,22 +208,243 @@ class KamusController extends Controller
                     }
                     $result = $result;
                 }
-
-                if($result[$a] == "insaidi"){
-                    if($jnsKata[$a+2] == "verba"){
-                        $verbaKami = KataModel::firstWhere("kataMuna", "like", "%".$result[$a+2]);
+                // Sisipan tidak, belum dan sudah
+                if($result[$a] == "insaidi" && $result[$a+1] == "miina" || $result[$a] == "insaidi" && $result[$a+1] == "minaho" || $result[$a] == "insaidi" && $result[$a+1] == "padamo"){
+                    if ($jnsKata[$a+2] != "verba"){
+                        $result[$a+2] = $result[$a+2];
+                        if(empty($jnsKata[$a+3])) {
+                            echo json_encode($result);
+                            exit;
+                        }
+                    } else {
+                        $verbaKami = KataModel::firstWhere("kataMuna", "like", $result[$a+2]);
                         $result[$a+2] = $verbaKami->vKami;
+                        if(empty($jnsKata[$a+3])) {
+                            echo json_encode($result);
+                            exit;
+                        }
+                    }
+                }
+
+
+                // positif kata Ganti Kamu -------------------------------------------------------------------
+                if($result[$a] == "ihintu"){
+                    if (empty($result[$a+1])) {
+                        echo json_encode($result);
+                        exit;
+                    } 
+                    else if ($jnsKata[$a+1] != "verba"){
+                        $result[$a+1] = $result[$a+1];
+                        if(empty($jnsKata[$a+2])) {
+                            echo json_encode($result);
+                            exit;
+                        }
+                    }
+                    else {
+                        $verbaKamu = KataModel::firstWhere("kataMuna", "like", $result[$a+1]);
+                        $result[$a+1] = $verbaKamu->vKamu;
+                        if(empty($jnsKata[$a+2])) {
+                            echo json_encode($result);
+                            exit;
+                        }
                     }
                     $result = $result;
                 }
+                // Sisipan tidak, belum dan sudah
+                if($result[$a] == "ihintu" && $result[$a+1] == "miina" || $result[$a] == "ihintu" && $result[$a+1] == "minaho" || $result[$a] == "ihintu" && $result[$a+1] == "padamo"){
+                    if ($jnsKata[$a+2] != "verba"){
+                        $result[$a+2] = $result[$a+2];
+                        if(empty($jnsKata[$a+3])) {
+                            echo json_encode($result);
+                            exit;
+                        }
+                    } else {
+                        $verbaKamu = KataModel::firstWhere("kataMuna", "like", $result[$a+2]);
+                        $result[$a+2] = $verbaKamu->vKamu;
+                        if(empty($jnsKata[$a+3])) {
+                            echo json_encode($result);
+                            exit;
+                        }
+                    }
+                    $result = $result;
+                }
+
+                // positif kata Ganti Dia -------------------------------------------------------------------
+                if($result[$a] == "anoa"){
+                    if (empty($result[$a+1])) {
+                        echo json_encode($result);
+                        exit;
+                    } 
+                    else if ($jnsKata[$a+1] != "verba"){
+                        $result[$a+1] = $result[$a+1];
+                        if(empty($jnsKata[$a+2])) {
+                            echo json_encode($result);
+                            exit;
+                        }
+                    }
+                    else {
+                        $verbaDia = KataModel::firstWhere("kataMuna", "like", $result[$a+1]);
+                        $result[$a+1] = $verbaDia->vDia;
+                        if(empty($jnsKata[$a+2])) {
+                            echo json_encode($result);
+                            exit;
+                        }
+                    }
+                    $result = $result;
+                }
+                // Sisipan tidak, belum dan sudah
+                if($result[$a] == "anoa" && $result[$a+1] == "miina" || $result[$a] == "anoa" && $result[$a+1] == "minaho" || $result[$a] == "anoa" && $result[$a+1] == "padamo"){
+                    if ($jnsKata[$a+2] != "verba"){
+                        $result[$a+2] = $result[$a+2];
+                        if(empty($jnsKata[$a+3])) {
+                            echo json_encode($result);
+                            exit;
+                        }
+                    } else {
+                        $verbaDia = KataModel::firstWhere("kataMuna", "like", $result[$a+2]);
+                        $result[$a+2] = $verbaDia->vDia;
+                        if(empty($jnsKata[$a+3])) {
+                            echo json_encode($result);
+                            exit;
+                        }
+                    }
+                    $result = $result;
+                }
+
+                // positif kata Ganti Mereka -------------------------------------------------------------------
+                if($result[$a] == "andoa") {
+                    if (empty($result[$a+1])) {
+                        echo json_encode($result);
+                        exit;
+                    } 
+                    else if ($jnsKata[$a+1] != "verba"){
+                        $result[$a+1] = $result[$a+1];
+                        if(empty($jnsKata[$a+2])) {
+                            echo json_encode($result);
+                            exit;
+                        }
+                    }
+                    else {
+                        $verbaMereka = KataModel::firstWhere("kataMuna", "like", $result[$a+1]);
+                        $result[$a+1] = $verbaMereka->vMereka;
+                        if(empty($jnsKata[$a+2])) {
+                            echo json_encode($result);
+                            exit;
+                        }
+                    }
+                    $result = $result;
+                }
+                // Sisipan tidak, belum dan sudah
+                if($result[$a] == "andoa" && $result[$a+1] == "miina" || $result[$a] == "andoa" && $result[$a+1] == "minaho" || $result[$a] == "andoa" && $result[$a+1] == "padamo"){
+                    if ($jnsKata[$a+2] != "verba"){
+                        $result[$a+2] = $result[$a+2];
+                        if(empty($jnsKata[$a+3])) {
+                            echo json_encode($result);
+                            exit;
+                        }
+                    } else {
+                        $verbaMereka = KataModel::firstWhere("kataMuna", "like", $result[$a+2]);
+                        $result[$a+2] = $verbaMereka->vMereka;
+                        if(empty($jnsKata[$a+3])) {
+                            echo json_encode($result);
+                            exit;
+                        }
+                    }
+                    $result = $result;
+                }
+
+                // MENGATASI NOUN/PRONOUN KEPUNYAAN ================================================================
+                // Saya
+                if($jnsKata[$a] === "noun" || $jnsKata[$a] === "pronoun2"){
+                    if(empty($result[$a+1])){
+                        echo json_encode($result);
+                        exit;
+                    }
+                    if($result[$a+1] === "inodi"){
+                        $result[$a+1] = "ku";
+                    }
+                }
+                // Kami
+                if($jnsKata[$a] === "noun" || $jnsKata[$a] === "pronoun2"){
+                    if(empty($result[$a+1])){
+                        echo json_encode($result);
+                        exit;
+                    }
+                    if($result[$a+1] === "insaidi"){
+                        $result[$a+1] = "mani";
+                    }
+                }
+                // Kamu
+                if($jnsKata[$a] === "noun" || $jnsKata[$a] === "pronoun2"){
+                    if(empty($result[$a+1])){
+                        echo json_encode($result);
+                        exit;
+                    }
+                    if($result[$a+1] === "ihintu"){
+                        $result[$a+1] = "mu";
+                    }
+                }
+                // Dia
+                if($jnsKata[$a] === "noun" || $jnsKata[$a] === "pronoun2"){
+                    if(empty($result[$a+1])){
+                        echo json_encode($result);
+                        exit;
+                    }
+                    if($result[$a+1] === "anoa"){
+                        $result[$a+1] = "no";
+                    }
+                }
+                // Mereka
+                if($jnsKata[$a] === "noun" || $jnsKata[$a] === "pronoun2"){
+                    if(empty($result[$a+1])){
+                        echo json_encode($result);
+                        exit;
+                    }
+                    if($result[$a+1] === "andoa"){
+                        $result[$a+1] = "ndo";
+                    }
+                }
+                // Nya
+                if($jnsKata[$a] === "noun" || $jnsKata[$a] === "pronoun2"){
+                    if(empty($result[$a+1])){
+                        echo json_encode($result);
+                        exit;
+                    }
+                    if($result[$a+1] === "nya"){
+                        $result[$a+1] = "no";
+                    }
+                }
+                // =================================================================================================
+
+
+                // $hitungKata = 0;
+                // $indexVerba = -1;
+                // for($b = 0; $b < count($jnsKata); $b++){
+    
+                //     if($jnsKata[$b] === "pronoun") {
+                //         $hitungKata++;
+                //     } else if ($jnsKata[$b] === "verba" && $hitungKata > 0){
+                //         $indexVerba = $b;
+                //         $verbaKami = KataModel::firstWhere("jns_kata", "like", $jnsKata[$indexVerba]);
+                //         $ganti = $verbaKami->vKami;
+                //         $result[$indexVerba] = $ganti;
+                //         // echo json_encode($ganti);
+                //         // break;
+                //     }
+                // }
+                // $verbaKami = KataModel::firstWhere("jns_kata", "like", $jnsKata[$indexVerba]);
+                // if($indexVerba !== -1){
+                //     $verbaKami = KataModel::firstWhere("kataMuna", "like", $result[$indexVerba]);
+                //     $result[$indexVerba] = $verbaKami->vKami;
+                // }
 
             }
 
             // $hasil = implode(" ", $result);
             // echo json_encode($hasil);
 
-
             echo json_encode($result);
+            // echo json_encode($jnsKata);
 
 
         }
