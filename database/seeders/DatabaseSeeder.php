@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use App\Models\KataModel;
 use App\Models\User;
 use App\Models\JenisKataModel;
+use App\Models\NickNameModel;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -25,6 +26,9 @@ class DatabaseSeeder extends Seeder
             "username" => "laskar",
             "email" => "laskar@gmail.com",
             "password" => bcrypt("laskar")
+        ]);
+        NickNameModel::create([
+            "nickName" => "hobbit"
         ]);
 
         KataModel::create([
