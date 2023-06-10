@@ -56,19 +56,23 @@ body {
     border-radius: 6px;
     color: white;
     background: linear-gradient(90deg, #004643, #004643);
-    box-shadow:  2px 2px 8px #f9bc60, -2px -2px 8px #f9bc60;
   }
 
-  #neubar .nav-item {
+  .nav-item {
     margin : auto 4px;
+    font-style: bold;
+    color: #001e1d;
+    text-decoration: none;
   }
   #neubar a {
     padding-left:12px;
     padding-right:12px;
+    text-decoration: none;
   }
   #neubar .dropdown-menu {
-    background : #545454
+    background-color: white;
   }
+
 
 
   /* textarea */
@@ -87,4 +91,8 @@ body {
   .textarea-wrapper {
     position: relative;
     margin-bottom: 1rem;
+  }
+
+  textarea#translate{
+    height: 200px;
   }

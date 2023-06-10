@@ -34,13 +34,13 @@ class KamusController extends Controller
     public function prosesKalimatIndo(Request $request)
     {
         // Kalimat yang dikirimkan dari ajax
-        $kalimat = $request->input("kalimatIndo");
+        $kalimat = strip_tags($request->input("kalimatIndo"));
 
         // ===================================================================================================
         // ================================== CODE PEMISAHAN KATA PERKATA ====================================
         // ===================================================================================================
         // $pattern = '/\b|\s+|(?=\p{P})|(?<=\p{P})/';
-        $pattern = '/\b|\s+|(?=\p{P}(?<!-))|(?<=(?<!-)\p{P})/';     
+        $pattern = '/\b|\s+|(?=\p{P}(?<!-))|(?<=(?<!-)\p{P})/';
         $kalimat = preg_split($pattern, $kalimat, -1, PREG_SPLIT_NO_EMPTY);
 
         // ===================================================================================================
@@ -70,12 +70,6 @@ class KamusController extends Controller
         // ===================================================================================================
         // ==================================== CODE PEMROSESAN IMBUHAN ======================================
         // ===================================================================================================
-
-
-        // LIBRARY SASTRAWI UNTUK MENGHILANGKAN IMBUHAN DEPAN
-        $factory = new StemmerFactory();
-        $stemmer = $factory->createStemmer();
-
         // Proses IMBUHAN
         // Cek kata
         $cekKata = KataModel::all();
@@ -92,7 +86,7 @@ class KamusController extends Controller
             else {
                 $akhiran = ["ku", "mu", "nya"];
                 foreach($akhiran as $akhir){
-                    if(substr($klmt, -strlen($akhir)) === $akhir){ // jika akhiran klmt = $akhiran 
+                    if(substr($klmt, -strlen($akhir)) === $akhir){ // jika akhiran klmt = $akhiran
                         $kalimat[$index] = substr($klmt, 0, -strlen($akhir))." ". $akhir;
                         break;
                     }
@@ -101,9 +95,31 @@ class KamusController extends Controller
         }
         $kalimat = implode(" ", $kalimat);
         $kalimat = explode(" ", $kalimat);
-        // echo json_encode($kalimat);exit;
 
-        // ================================= IMBUHAN AKHIRAN =================================================
+        // ================================== IMBUHAN AWALAN =================================================
+        foreach($kalimat as $index => $klmt){
+            if(in_array($klmt, $dicek)){
+                $kalimat[$index] = $kalimat[$index];
+            }
+            else {
+                $awalan = ["di", "ke"];
+                foreach($awalan as $awal){
+                    if(substr($klmt, 0, strlen($awal)) === $awal){ // jika akhiran klmt = $akhiran 
+                        $kalimat[$index] = $awal ." ". substr($klmt, strlen($awal), strlen($klmt));
+                        break;
+                    }
+                }
+            }
+        }
+        $kalimat = implode(" ", $kalimat);
+        $kalimat = explode(" ", $kalimat);
+
+        // ================================= IMBUHAN STEMMER =================================================
+        
+        // LIBRARY SASTRAWI UNTUK MENGHILANGKAN IMBUHAN DEPAN
+        $factory = new StemmerFactory();
+        $stemmer = $factory->createStemmer();
+        
         for($z=0;$z<count($kalimat);$z++){
 
             if(in_array($kalimat[$z], $dicek)){
@@ -146,7 +162,7 @@ class KamusController extends Controller
         // ===================================================================================================
         if(count($result) == 1){
 
-            echo json_encode($result);
+            echo json_encode(implode(" ", $result));
         }
         
         else 
@@ -161,13 +177,13 @@ class KamusController extends Controller
                 // positif kata Ganti saya -------------------------------------------------------------------
                 if($result[$a] == "inodi"){
                     if (empty($result[$a+1])) {
-                        echo json_encode($result);
+                        echo json_encode(implode(" ", $result));
                         exit;
                     }
                     else if ($jnsKata[$a+1] != "verba"){
                         $result[$a+1] = $result[$a+1];
                         if(empty($jnsKata[$a+2])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -175,7 +191,7 @@ class KamusController extends Controller
                         $verbaSaya = KataModel::firstWhere("kataMuna", "like", $result[$a+1]);
                         $result[$a+1] = $verbaSaya->vSaya;
                         if(empty($jnsKata[$a+2])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -186,14 +202,14 @@ class KamusController extends Controller
                     if ($jnsKata[$a+2] != "verba"){
                         $result[$a+2] = $result[$a+2];
                         if(empty($jnsKata[$a+3])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     } else {
                         $verbaSaya = KataModel::firstWhere("kataMuna", "like", $result[$a+2]);
                         $result[$a+2] = $verbaSaya->vSaya;
                         if(empty($jnsKata[$a+3])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -203,14 +219,14 @@ class KamusController extends Controller
                     if ($jnsKata[$a+3] != "verba"){
                         $result[$a+3] = $result[$a+3];
                         if(empty($jnsKata[$a+4])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     } else {
                         $verbaSaya = KataModel::firstWhere("kataMuna", "like", $result[$a+3]);
                         $result[$a+3] = $verbaSaya->vSaya;
                         if(empty($jnsKata[$a+4])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -221,13 +237,13 @@ class KamusController extends Controller
                 // positif kata Ganti Kami -------------------------------------------------------------------
                 if($result[$a] == "insaidi"){
                     if (empty($result[$a+1])) {
-                        echo json_encode($result);
+                        echo json_encode(implode(" ", $result));
                         exit;
                     } 
                     else if ($jnsKata[$a+1] != "verba"){
                         $result[$a+1] = $result[$a+1];
                         if(empty($jnsKata[$a+2])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -235,7 +251,7 @@ class KamusController extends Controller
                         $verbaKami = KataModel::firstWhere("kataMuna", "like", $result[$a+1]);
                         $result[$a+1] = $verbaKami->vKami;
                         if(empty($jnsKata[$a+2])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -246,14 +262,14 @@ class KamusController extends Controller
                     if ($jnsKata[$a+2] != "verba"){
                         $result[$a+2] = $result[$a+2];
                         if(empty($jnsKata[$a+3])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     } else {
                         $verbaKami = KataModel::firstWhere("kataMuna", "like", $result[$a+2]);
                         $result[$a+2] = $verbaKami->vKami;
                         if(empty($jnsKata[$a+3])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -263,14 +279,14 @@ class KamusController extends Controller
                     if ($jnsKata[$a+3] != "verba"){
                         $result[$a+3] = $result[$a+3];
                         if(empty($jnsKata[$a+4])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     } else {
                         $verbaKami = KataModel::firstWhere("kataMuna", "like", $result[$a+3]);
                         $result[$a+3] = $verbaKami->vKami;
                         if(empty($jnsKata[$a+4])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -281,13 +297,13 @@ class KamusController extends Controller
                 // positif kata Ganti Kamu -------------------------------------------------------------------
                 if($result[$a] == "ihintu"){
                     if (empty($result[$a+1])) {
-                        echo json_encode($result);
+                        echo json_encode(implode(" ", $result));
                         exit;
                     } 
                     else if ($jnsKata[$a+1] != "verba"){
                         $result[$a+1] = $result[$a+1];
                         if(empty($jnsKata[$a+2])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -295,7 +311,7 @@ class KamusController extends Controller
                         $verbaKamu = KataModel::firstWhere("kataMuna", "like", $result[$a+1]);
                         $result[$a+1] = $verbaKamu->vKamu;
                         if(empty($jnsKata[$a+2])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -306,14 +322,14 @@ class KamusController extends Controller
                     if ($jnsKata[$a+2] != "verba"){
                         $result[$a+2] = $result[$a+2];
                         if(empty($jnsKata[$a+3])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     } else {
                         $verbaKamu = KataModel::firstWhere("kataMuna", "like", $result[$a+2]);
                         $result[$a+2] = $verbaKamu->vKamu;
                         if(empty($jnsKata[$a+3])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -323,14 +339,14 @@ class KamusController extends Controller
                     if ($jnsKata[$a+3] != "verba"){
                         $result[$a+3] = $result[$a+3];
                         if(empty($jnsKata[$a+4])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     } else {
                         $verbaKamu = KataModel::firstWhere("kataMuna", "like", $result[$a+3]);
                         $result[$a+3] = $verbaKamu->vKamu;
                         if(empty($jnsKata[$a+4])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -340,13 +356,13 @@ class KamusController extends Controller
                 // positif kata Ganti Dia -------------------------------------------------------------------
                 if($result[$a] == "anoa" || $jnsKata[$a] == "pronoun2" || in_array($result[$a], $nama)) {
                     if (empty($result[$a+1])) {
-                        echo json_encode($result);
+                        echo json_encode(implode(" ", $result));
                         exit;
                     } 
                     else if ($jnsKata[$a+1] != "verba"){
                         $result[$a+1] = $result[$a+1];
                         if(empty($jnsKata[$a+2])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -354,7 +370,7 @@ class KamusController extends Controller
                         $verbaDia = KataModel::firstWhere("kataMuna", "like", $result[$a+1]);
                         $result[$a+1] = $verbaDia->vDia;
                         if(empty($jnsKata[$a+2])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -365,14 +381,14 @@ class KamusController extends Controller
                     if ($jnsKata[$a+2] != "verba"){
                         $result[$a+2] = $result[$a+2];
                         if(empty($jnsKata[$a+3])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     } else {
                         $verbaDia = KataModel::firstWhere("kataMuna", "like", $result[$a+2]);
                         $result[$a+2] = $verbaDia->vDia;
                         if(empty($jnsKata[$a+3])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -382,14 +398,14 @@ class KamusController extends Controller
                     if ($jnsKata[$a+3] != "verba"){
                         $result[$a+3] = $result[$a+3];
                         if(empty($jnsKata[$a+4])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     } else {
                         $verbaDia = KataModel::firstWhere("kataMuna", "like", $result[$a+3]);
                         $result[$a+3] = $verbaDia->vDia;
                         if(empty($jnsKata[$a+4])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -399,13 +415,13 @@ class KamusController extends Controller
                 // positif kata Ganti Mereka -------------------------------------------------------------------
                 if($result[$a] == "andoa") {
                     if (empty($result[$a+1])) {
-                        echo json_encode($result);
+                        echo json_encode(implode(" ", $result));
                         exit;
                     } 
                     else if ($jnsKata[$a+1] != "verba"){
                         $result[$a+1] = $result[$a+1];
                         if(empty($jnsKata[$a+2])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -413,7 +429,7 @@ class KamusController extends Controller
                         $verbaMereka = KataModel::firstWhere("kataMuna", "like", $result[$a+1]);
                         $result[$a+1] = $verbaMereka->vMereka;
                         if(empty($jnsKata[$a+2])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -424,14 +440,14 @@ class KamusController extends Controller
                     if ($jnsKata[$a+2] != "verba"){
                         $result[$a+2] = $result[$a+2];
                         if(empty($jnsKata[$a+3])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     } else {
                         $verbaMereka = KataModel::firstWhere("kataMuna", "like", $result[$a+2]);
                         $result[$a+2] = $verbaMereka->vMereka;
                         if(empty($jnsKata[$a+3])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -441,14 +457,14 @@ class KamusController extends Controller
                     if ($jnsKata[$a+3] != "verba"){
                         $result[$a+3] = $result[$a+3];
                         if(empty($jnsKata[$a+4])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     } else {
                         $verbaMereka = KataModel::firstWhere("kataMuna", "like", $result[$a+3]);
                         $result[$a+3] = $verbaMereka->vMereka;
                         if(empty($jnsKata[$a+4])) {
-                            echo json_encode($result);
+                            echo json_encode(implode(" ", $result));
                             exit;
                         }
                     }
@@ -463,7 +479,7 @@ class KamusController extends Controller
                 // Saya
                 if($jnsKata[$a] === "noun" || $jnsKata[$a] === "pronoun2"){
                     if(empty($result[$a+1])){
-                        echo json_encode($result);
+                        echo json_encode(implode(" ", $result));
                         exit;
                     }
                     if($result[$a+1] === "inodi"){
@@ -473,7 +489,7 @@ class KamusController extends Controller
                 // Kami
                 if($jnsKata[$a] === "noun" || $jnsKata[$a] === "pronoun2"){
                     if(empty($result[$a+1])){
-                        echo json_encode($result);
+                        echo json_encode(implode(" ", $result));
                         exit;
                     }
                     if($result[$a+1] === "insaidi"){
@@ -483,7 +499,7 @@ class KamusController extends Controller
                 // Kamu
                 if($jnsKata[$a] === "noun" || $jnsKata[$a] === "pronoun2"){
                     if(empty($result[$a+1])){
-                        echo json_encode($result);
+                        echo json_encode(implode(" ", $result));
                         exit;
                     }
                     if($result[$a+1] === "ihintu"){
@@ -493,7 +509,7 @@ class KamusController extends Controller
                 // Dia
                 if($jnsKata[$a] === "noun" || $jnsKata[$a] === "pronoun2"){
                     if(empty($result[$a+1])){
-                        echo json_encode($result);
+                        echo json_encode(implode(" ", $result));
                         exit;
                     }
                     if($result[$a+1] === "anoa"){
@@ -503,7 +519,7 @@ class KamusController extends Controller
                 // Mereka
                 if($jnsKata[$a] === "noun" || $jnsKata[$a] === "pronoun2"){
                     if(empty($result[$a+1])){
-                        echo json_encode($result);
+                        echo json_encode(implode(" ", $result));
                         exit;
                     }
                     if($result[$a+1] === "andoa"){
@@ -513,7 +529,7 @@ class KamusController extends Controller
                 // Nya
                 if($jnsKata[$a] === "noun" || $jnsKata[$a] === "pronoun2"){
                     if(empty($result[$a+1])){
-                        echo json_encode($result);
+                        echo json_encode(implode(" ", $result));
                         exit;
                     }
                     if($result[$a+1] === "nya"){
@@ -526,7 +542,7 @@ class KamusController extends Controller
                 // ===================================================================================================
                 if($jnsKata[$a] === "noun" || $jnsKata[$a] === "pronoun2" || $jnsKata[$a] === "empty"){
                     if(empty($result[$a+1])){
-                        echo json_encode($result);
+                        echo json_encode(implode(" ", $result));
                         exit;
                     }
                     if($result[$a+1] === "ku" || $result[$a+1] === "mu" || $result[$a+1] === "mani" || $result[$a+1] === "ndo" || $result[$a+1] === "no" || $result[$a+1] === "nya"){
@@ -559,11 +575,12 @@ class KamusController extends Controller
                 // }
 
             }
+            $hasilProses = $result;
 
-            // $hasil = implode(" ", $result);
-            // echo json_encode($hasil);
+            $hasil = implode(" ", $hasilProses);
+            echo json_encode($hasil);
 
-            echo json_encode($result);
+            // echo json_encode(implode(" ", $result));
             // echo json_encode($jnsKata);
 
 

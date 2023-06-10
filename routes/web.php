@@ -17,11 +17,15 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('kamus');
+    return view('translate');
 });
 
 Route::get('/translate', function(){
     return view('translate');
+});
+
+Route::get('/tentang', function(){
+    return view('about');
 });
 
 Route::get('prosesKata', [KamusController::class, "prosesKataIndo"]);

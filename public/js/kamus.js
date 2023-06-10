@@ -28,9 +28,9 @@ $(function () {
             method: "get",
             url: "http://kamus-muna.test:8080/prosesKalimatIndo",
             data: { kalimatIndo: kalimatIndo },
-            // dataType: "json",
+            dataType: "json",
             success: function (hasil) {
-                // $("#translate").val(hasil);
+                $("#translate").val(hasil);
                 console.log(hasil);
             },
         });
