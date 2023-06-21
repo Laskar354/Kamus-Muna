@@ -32,7 +32,7 @@
                 <select class="form-select @error('jns_kata') is-invalid @enderror" id="jns_kata" aria-label="Default select example" name="jns_kata">
                     <option value="noun" selected>noun</option>
                     <option value="pronoun">pronoun</option>
-                    <option value="pronoun2">pronoun2</option>
+                    <option value="kedua">kedua</option>
                     <option value="adverb">adverb</option>
                     <option value="sambung">sambung</option>
                     <option value="tanda">tanda</option>

@@ -33,7 +33,7 @@
                 <select class="form-select @error('jns_kata') is-invalid @enderror" id="jns_kata" aria-label="Default select example" name="jns_kata">
                     <option value="noun" {{$word->jns_kata == "noun" ? "selected" : ""}}>noun</option>
                     <option value="pronoun" {{$word->jns_kata == "pronoun" ? "selected" : ""}}>pronoun</option>
-                    <option value="pronoun2" {{$word->jns_kata == "pronoun2" ? "selected" : ""}}>pronoun2</option>
+                    <option value="kedua" {{$word->jns_kata == "kedu" ? "selected" : ""}}>kedua</option>
                     <option value="adverb" {{$word->jns_kata == "adverb" ? "selected" : ""}}>adverb</option>
                     <option value="sambung" {{$word->jns_kata == "sambung" ? "selected" : ""}}>sambung</option>
                     <option value="tanda" {{$word->jns_kata == "tanda" ? "selected" : ""}}>tanda</option>

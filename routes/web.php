@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\DashboardKamusController;
 use App\Http\Controllers\KamusController;
-use App\Http\Controllers\loginAdminController;
+use App\Http\Controllers\LoginAdminController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,9 +33,9 @@ Route::get('prosesKalimatIndo', [KamusController::class, "prosesKalimatIndo"]);
 
 
 // Login dan logout Admin
-Route::get('/translate/loginAdmin', [LoginAdminController::class, "index"])->middleware("guest");
-Route::post('/translate/loginAdmin', [LoginAdminController::class, "authenticate"])->middleware("guest");
-Route::post('/translate/logoutAdmin', [LoginAdminController::class, "logout"]);
+Route::get('/loginAdmin', [LoginAdminController::class, "index"])->middleware("guest");
+Route::post('/loginAdmin', [LoginAdminController::class, "authenticate"])->middleware("guest");
+Route::post('/logoutAdmin', [LoginAdminController::class, "logout"]);
 
 
 //Dashbord Kamus

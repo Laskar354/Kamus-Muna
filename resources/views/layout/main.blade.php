@@ -13,9 +13,10 @@
 
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
         <link rel="stylesheet" href="/css/style.css">
+        <link rel="stylesheet" href="/css/navbar.css">
 
 
-        <title>Kamus Bahasa Muna</title>
+        <title>Kamus Indonesia - Muna</title>
     </head>
     <body>
 
@@ -43,5 +44,6 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
         -->
         <script src="/js/kamus.js"></script>
+        <script src="/js/hamburger.js"></script>
     </body>
 </html>

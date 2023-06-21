@@ -20,9 +20,21 @@ body {
     padding: 10px 20px;
     font-size: 18px;
     margin-top: 20px;
-    color: #001e1d;
+    color: #004643;
     background-color: #f9bc60;
-    border: none;
+    border-radius: 5px;
+    border: 0px;
+    outline: none;
+    cursor: pointer;
+  }
+  button:hover {
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+    color: #004643;
+    background-color: #f9bc60;
+    border: #f9bc60 solid inherit 2px;
     border-radius: 5px;
     outline: none;
     cursor: pointer;
@@ -94,5 +106,9 @@ body {
   }
 
   textarea#translate{
-    height: 200px;
+    height: 150px;
+  }
+  textarea#translateIndo{
+    height: 150px;
+    border: #004643 solid 2px;
   }

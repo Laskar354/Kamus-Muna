@@ -19,7 +19,7 @@
                 </div>
                 @endif
 
-                <form action="/translate/loginAdmin" method="post">
+                <form action="/loginAdmin" method="post">
                     @csrf
                     <h1 class="h3 mb-3 fw-normal text-center fw-bold mb-3">Form Login Admin</h1>
                 

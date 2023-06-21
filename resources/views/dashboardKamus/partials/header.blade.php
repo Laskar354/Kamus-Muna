@@ -6,7 +6,7 @@
     <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
     <div class="navbar-nav">
         <div class="nav-item text-nowrap">
-        <form action="/translate/logoutAdmin" method="post">
+        <form action="/logoutAdmin" method="post">
         @csrf
         <button type="submit" class="nav-link px-2 bg-dark text-warning">Log-out</button>
         </form>

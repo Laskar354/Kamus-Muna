@@ -9,7 +9,7 @@
             <h6 class="mb-5 text-dark">Contoh : Mereka(subjek) makan(predikat) nasi(objek) di dapur(keterangan)</h6>
             <form action="" id="formTranslateIndo">
                 <div class="form-outline">
-                    <textarea class="form-control" name="translateIndo" id="translateIndo" rows="5" placeholder="Masukkan kalimat yang ingin diterjemahkan !"></textarea>
+                    <textarea class="form-control" name="translateIndo" id="translateIndo" rows="5" placeholder="Masukkan kalimat yang ingin diterjemahkan !" autofocus></textarea>
                 </div>
                 <button type="submit">Terjemahkan</button>
             </form>

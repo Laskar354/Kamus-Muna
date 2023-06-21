@@ -1,22 +1,4 @@
 $(function () {
-    // Kamus Indo-Muna
-    $("#formKamus").submit(function (e) {
-        e.preventDefault();
-
-        const kata = $("input[name=kataIndo]").val();
-        // console.log(kata);
-
-        $.ajax({
-            method: "get",
-            url: "http://kamus-muna.test:8080/prosesKata",
-            data: { kata: kata },
-            dataType: "json",
-            success: function (hasil) {
-                $("#arti").html(hasil);
-            },
-        });
-    });
-
     // Translate indo-muna
     $("#formTranslateIndo").submit(function (e) {
         e.preventDefault();
@@ -31,7 +13,7 @@ $(function () {
             dataType: "json",
             success: function (hasil) {
                 $("#translate").val(hasil);
-                console.log(hasil);
+                // console.log(hasil);
             },
         });
     });
