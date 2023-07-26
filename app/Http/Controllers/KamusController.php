@@ -77,7 +77,7 @@ class KamusController extends Controller
         $kalimat = implode(" ", $kalimat);
         $kalimat = explode(" ", $kalimat);
 
-        // ================================== IMBUHAN AWALAN =================================================
+        // ================================== DI dan KE =================================================
         foreach($kalimat as $index => $klmt){
             if(in_array($klmt, $dicek)){
                 $kalimat[$index] = $kalimat[$index];
