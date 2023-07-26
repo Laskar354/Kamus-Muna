@@ -151,7 +151,7 @@ class KamusController extends Controller
         {
         // ============================================== KALIMAT ============================================
         
-            $sisipan = ["miina", "minaho", "padamo", "aini", "awatu", "hunda"];
+            $sisipan = ["miina", "minaho", "padamo", "aini", "awatu", "hunda", "naando"];
 
             for($a = 0; $a < count($result); $a++) {
 
